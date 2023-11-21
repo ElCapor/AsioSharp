@@ -10,33 +10,9 @@ public class NetServer : Server
         Console.WriteLine("Created server");
         roomManager = new(2, OnRoomPlayerAdded);
         playerMap = new();
-        roomDeleteList = new();
-        roomCreateList = new();
-        roomClearList = new();
+        
     }
 
-    public override void Update()
-    {
-        base.Update();
-
-        for (int i = roomDeleteList.Count - 1; i >= 0; i--)
-        {
-            roomDeleteList[i].del.Invoke(roomDeleteList[i].param);
-            roomDeleteList.RemoveAt(i);
-        }
-
-        for (int i = roomCreateList.Count - 1; i >= 0; i--)
-        {
-            roomCreateList[i].Invoke();
-            roomCreateList.RemoveAt(i);
-        }
-
-        for (int i = roomClearList.Count - 1; i >= 0; i--)
-        {
-            roomClearList[i].del.Invoke(roomClearList[i].param);
-            roomClearList.RemoveAt(i);
-        }
-    }
     public void OnConnect(object? sender, ServerConnectedEventArgs args)
     {
         Console.WriteLine($"OnConnect {args.Client.Id}");
@@ -89,47 +65,16 @@ public class NetServer : Server
             }
         }
     }
-    public delegate void ClearRoomDelegate(ushort roomID);
+    
 
-    public struct roomClearInfo
-    {
-        public ClearRoomDelegate del;
-        public ushort param;
-    }
-
-
-    public delegate void DeleteRoomDelegate(ushort roomID);
-
-    public struct roomDeleteInfo
-    {
-        public DeleteRoomDelegate del;
-        public ushort param;
-    }
-
-    public List<roomClearInfo> roomClearList;
-    public List<roomDeleteInfo> roomDeleteList;
-
-
-    public delegate void CreateRoomDelegate();
-    public List<CreateRoomDelegate> roomCreateList;
-
-    public void CreateRoomImpl()
+    public void CreateRoom()
     {
         roomManager.CreateNewRoom(); // new room isnt subject to gc
     }
 
-    public void CreateRoom()
+    public void ClearRoom(ushort roomId)
     {
-        CreateRoomDelegate del = CreateRoomImpl;
-        roomCreateList.Add(del);
-    }
-    
-    public void ClearRoomImpl(ushort roomId)
-    {
-        // fix by danilwhale on discord , thanks to him
-        // var list = roomManager.rooms[roomManager.GetRoomIndexByID(roomId)].playerList;
-
-        for (int i = roomManager.rooms[roomManager.GetRoomIndexByID(roomId)].playerList.Count - 1; i >=0; i--)
+        for (int i = roomManager.rooms[roomManager.GetRoomIndexByID(roomId)].playerList.Count - 1; i >= 0; i--)
         {
             ushort player_id = roomManager.rooms[roomManager.GetRoomIndexByID(roomId)].playerList[i].id;
             Player p = playerMap.FirstOrDefault(x => x.Value.id == player_id).Value;
@@ -140,18 +85,8 @@ public class NetServer : Server
             DisconnectClient(connection);
         }
     }
-
-
-    public void ClearRoom(ushort roomId)
-    {
-        roomClearInfo info = new();
-        info.del = ClearRoomImpl;
-        info.param = roomId;
-        roomClearList.Add(info);
-    }
     
-
-    public void DeleteRoomImpl(ushort roomId)
+    public void DeleteRoom(ushort roomId)
     {
         if (roomManager.rooms[roomManager.GetRoomIndexByID(roomId)].isEmpty())
         {
@@ -163,14 +98,4 @@ public class NetServer : Server
             ClearRoom(roomId); // will get gc'd
         }
     }
-
-    public void DeleteRoom(ushort roomId)
-    {
-        roomDeleteInfo info = new();
-        info.del = DeleteRoomImpl;
-        info.param = roomId;
-        roomDeleteList.Add(info);
-    }
-
-
 }

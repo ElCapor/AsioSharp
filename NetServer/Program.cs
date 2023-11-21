@@ -25,11 +25,13 @@ public static class ServerImguiOverlay
                 if (ImGui.SmallButton("Clear"))
                 {
                     server.ClearRoom(rm.rooms[i].GetID());
+                    continue;
                 }
                 ImGui.SameLine();
                 if (ImGui.SmallButton("Delete"))
                 {
                     server.DeleteRoom(rm.rooms[i].GetID());
+                    continue;
                 }
                 ImGui.Text($"Room ID : {rm.rooms[i].GetID()}");
                 
