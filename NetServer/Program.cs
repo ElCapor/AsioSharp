@@ -12,6 +12,10 @@ public static class ServerImguiOverlay
     public static void RenderRooms(ref NetServer server)
     {
         ref RoomManager rm = ref server.roomManager;
+        if (ImGui.Button("Create Room"))
+        {
+            server.CreateRoom();
+        }
         for (int i = 0; i < rm.rooms.Count; i++)
         {
             
@@ -21,6 +25,11 @@ public static class ServerImguiOverlay
                 if (ImGui.SmallButton("Clear"))
                 {
                     server.ClearRoom(rm.rooms[i].GetID());
+                }
+                ImGui.SameLine();
+                if (ImGui.SmallButton("Delete"))
+                {
+                    server.DeleteRoom(rm.rooms[i].GetID());
                 }
                 ImGui.Text($"Room ID : {rm.rooms[i].GetID()}");
                 

@@ -3,7 +3,7 @@
 public class RoomManager
 {
     public List<Room> rooms = new();
-    int maxRoomIndex = -1;
+    public int maxRoomIndex = -1;
 
     int maxRoomSize;
 

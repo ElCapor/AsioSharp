@@ -11,6 +11,8 @@ public class NetServer : Server
         roomManager = new(2, OnRoomPlayerAdded);
         playerMap = new();
         roomDeleteList = new();
+        roomCreateList = new();
+        roomClearList = new();
     }
 
     public override void Update()
@@ -27,6 +29,12 @@ public class NetServer : Server
         {
             roomCreateList[i].Invoke();
             roomCreateList.RemoveAt(i);
+        }
+
+        for (int i = roomClearList.Count - 1; i >= 0; i--)
+        {
+            roomClearList[i].del.Invoke(roomClearList[i].param);
+            roomClearList.RemoveAt(i);
         }
     }
     public void OnConnect(object? sender, ServerConnectedEventArgs args)
@@ -83,12 +91,22 @@ public class NetServer : Server
     }
     public delegate void ClearRoomDelegate(ushort roomID);
 
-    public struct roomDeleteInfo
+    public struct roomClearInfo
     {
         public ClearRoomDelegate del;
         public ushort param;
     }
 
+
+    public delegate void DeleteRoomDelegate(ushort roomID);
+
+    public struct roomDeleteInfo
+    {
+        public DeleteRoomDelegate del;
+        public ushort param;
+    }
+
+    public List<roomClearInfo> roomClearList;
     public List<roomDeleteInfo> roomDeleteList;
 
 
@@ -126,12 +144,33 @@ public class NetServer : Server
 
     public void ClearRoom(ushort roomId)
     {
-        roomDeleteInfo info = new();
+        roomClearInfo info = new();
         info.del = ClearRoomImpl;
+        info.param = roomId;
+        roomClearList.Add(info);
+    }
+    
+
+    public void DeleteRoomImpl(ushort roomId)
+    {
+        if (roomManager.rooms[roomManager.GetRoomIndexByID(roomId)].isEmpty())
+        {
+            roomManager.rooms.RemoveAt(roomManager.GetRoomIndexByID(roomId));
+            roomManager.maxRoomIndex = roomManager.rooms.Count;
+        }
+        else
+        {
+            ClearRoom(roomId); // will get gc'd
+        }
+    }
+
+    public void DeleteRoom(ushort roomId)
+    {
+        roomDeleteInfo info = new();
+        info.del = DeleteRoomImpl;
         info.param = roomId;
         roomDeleteList.Add(info);
     }
-    
 
 
 }
