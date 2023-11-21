@@ -36,12 +36,16 @@ public static class ServerImguiOverlay
                 ImGui.Text($"Room ID : {rm.rooms[i].GetID()}");
                 
 
-                for (int j = 0; j < rm.rooms[i].playerList.Count; j++)
+                for (int j = rm.rooms[i].playerList.Count -1; j >=0 ; j--)
                 {
                     if (ImGui.TreeNode($"Player {j}"))
                     {
                         ImGui.SameLine();
-                        ImGui.SmallButton("kick");
+                        if (ImGui.SmallButton("kick"))
+                        {
+                            server.KickPlayer(rm.rooms[i].playerList[j].id);
+                            continue;
+                        }
                         ImGui.Text($"Player id {rm.rooms[i].playerList[j].id}");
                         ImGui.TreePop();
 

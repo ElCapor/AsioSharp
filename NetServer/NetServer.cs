@@ -98,4 +98,14 @@ public class NetServer : Server
             ClearRoom(roomId); // will get gc'd
         }
     }
+
+    public void KickPlayer(ushort playerId)
+    {
+        Player p = playerMap.FirstOrDefault(x => x.Value.id == playerId).Value;
+        int clientID = playerMap.FirstOrDefault(p => p.Value.id == playerId).Key;
+        Connection? connection = this.Clients.FirstOrDefault(p => p.Id == clientID);
+        roomManager.rooms.Where(r => r.playerList.Exists(player => player.id == playerId)).FirstOrDefault()?.RemovePlayer(p);
+
+        DisconnectClient(connection);
+    }
 }
