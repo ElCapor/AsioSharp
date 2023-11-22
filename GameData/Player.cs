@@ -16,6 +16,12 @@ namespace GameData
         public Vector2 previousVelocity;
         public bool isReady = false;
         public ushort id;
+
+        public EventHandler? playerStartMoveDownEvent;
+        public EventHandler? playerStartMoveUpEvent;
+
+        public EventHandler? playerStopMoveEvent;
+
         public Player() {
             Position = new();
             Velocity = new();
@@ -35,11 +41,12 @@ namespace GameData
 
         public void StartMoveUp()
         {
-            if (Position.Y + 20 < 0)
+            if (Position.Y + 20 > 0)
             {
                 previousVelocity = Velocity;
                 Velocity.X = 0;
                 Velocity.Y -= 5;
+                playerStartMoveUpEvent?.Invoke(this, new EventArgs());
             }
             else
             {
@@ -58,6 +65,7 @@ namespace GameData
                 previousVelocity = Velocity;
                 Velocity.X = 0;
                 Velocity.Y += 5;
+                playerStartMoveDownEvent?.Invoke(this, new EventArgs());
             }
             else
             {
@@ -72,6 +80,7 @@ namespace GameData
             previousVelocity = Velocity;
             Velocity.X = 0;
             Velocity.Y = 0;
+            playerStopMoveEvent?.Invoke(this, new EventArgs());
         }
 
         public void Update()

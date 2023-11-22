@@ -11,6 +11,10 @@ namespace GameData
     {
         JoinedRoom, // player was sent to a room
         SendRoomFull, // the room is now full
+        PlayerIsReady,
+        PlayerMoveDown,
+        PlayerMoveUp,
+        PlayerStopMove,
 
     }
 }

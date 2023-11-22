@@ -26,9 +26,42 @@ public class App
     {
         ushort otherPlayerID = msg.GetUShort();
         Console.WriteLine($"Room is full {otherPlayerID}");
-    }
-   
 
+        Message ret = Message.Create(MessageSendMode.Reliable, ClientMessage.ReadyToStart);
+        _client.Send(ret);
+    }
+
+    [MessageHandler((ushort)ServerMessage.PlayerIsReady)]
+    public static void HandleOtherPlayerReady(Message msg)
+    {
+        ushort pid = msg.GetUShort();
+        otherPlayer.isReady = true;
+    }
+
+    [MessageHandler((ushort)ServerMessage.PlayerMoveDown)]
+    public static void HandlerPlayerMoveDown(Message msg)
+    {
+        Console.WriteLine("Other player started moving");
+
+        ushort pid = msg.GetUShort();
+        otherPlayer.StartMoveDown();
+    }
+
+    [MessageHandler((ushort)ServerMessage.PlayerStopMove)]
+    public static void HandlerPlayerMoveStop(Message msg)
+    {
+        Console.WriteLine("Other player stopped moving");
+        ushort pid = msg.GetUShort() ;
+        otherPlayer.StopMove();
+    }
+
+    [MessageHandler((ushort)ServerMessage.PlayerMoveUp)]
+    public static void HandlerPlayerMoveUp(Message msg)
+    {
+        Console.WriteLine("Other player move up");
+        ushort pid = msg.GetUShort();
+        otherPlayer.StartMoveUp();
+    }
     public static void OnConnect(object? sender, EventArgs eventArgs)
     {
         Console.WriteLine($"Connection Succeded , launching game...");
@@ -60,26 +93,60 @@ public class App
         InitWindow(800, 600, "demo");
         SetTargetFPS(60);
         LocalPlayer.isReady = true;
+
+        LocalPlayer.playerStartMoveDownEvent += (object sender, EventArgs args) =>
+        {
+            Console.WriteLine("Moved down");
+            Message mv = Message.Create(MessageSendMode.Reliable, ClientMessage.StartMoveDown);
+            _client.Send(mv);
+        };
+
+        LocalPlayer.playerStartMoveUpEvent += (object sender, EventArgs args) =>
+        {
+            Console.WriteLine("Moved up");
+            Message mv = Message.Create(MessageSendMode.Reliable, ClientMessage.StartMoveUp);
+            _client.Send(mv);
+        };
+
+        LocalPlayer.playerStopMoveEvent += (object sender, EventArgs args) =>
+        {
+            Console.WriteLine("Move Stop");
+            Message mv = Message.Create(MessageSendMode.Reliable, ClientMessage.StopMove);
+            _client.Send(mv);
+        };
+
+        otherPlayer.Position.X = 790;
         while (!WindowShouldClose())
         {
             _client.Update();
             if (LocalPlayer.isReady && otherPlayer.isReady)
             {
-                if (GetKeyPressed() == (int)KeyboardKey.KEY_DOWN)
+                if (IsKeyPressed(KeyboardKey.KEY_DOWN))
                 {
                     Console.WriteLine("Down");
                     LocalPlayer.StartMoveDown();
+                }
+                else if (IsKeyPressed(KeyboardKey.KEY_UP))
+                {
+                    Console.WriteLine("Up");
+                    LocalPlayer.StartMoveUp();
                 }
                 else if (IsKeyReleased(KeyboardKey.KEY_DOWN))
                 {
                     LocalPlayer.StopMove();
                 }
+                else if (IsKeyReleased(KeyboardKey.KEY_UP))
+                {
+                    LocalPlayer.StopMove();
+                }
                 LocalPlayer.Update();
+                otherPlayer.Update();
                 BeginDrawing();
                 ClearBackground(Color.BLACK);
                 NetOverlay.DrawNetDebug(_client);
                 NetOverlay.DrawNetPlayer(LocalPlayer);
                 LocalPlayer.Draw();
+                otherPlayer.Draw();
                 EndDrawing();
             }
             else

@@ -117,6 +117,78 @@ public static class ServerImguiOverlay
 public class App
 {
     static NetServer _serv = new NetServer();
+
+    [MessageHandler((ushort)ClientMessage.ReadyToStart)]
+    public static void HandleReadyToStart(ushort clientID, Message msg)
+    {
+        _serv.playerMap[clientID].isReady = true;
+        Room? r = _serv.roomManager.rooms.Where(room => room.playerList.Exists(p => p.id == _serv.playerMap[clientID].id)).FirstOrDefault();
+        Player? p = _serv.GetOtherPlayerInRoom(r, _serv.playerMap[clientID].id);
+        if (p != null)
+        {
+            ushort cID = (ushort)_serv.playerMap.Where(c => c.Value.id == p?.id).FirstOrDefault().Key;
+            Connection conn = _serv.Clients.Where(c => c.Id == cID).FirstOrDefault();
+            Message ret = Message.Create(MessageSendMode.Reliable, ServerMessage.PlayerIsReady);
+            ret.AddUShort(p.id);
+            _serv.Send(ret, conn);
+        }
+        
+    }
+
+    [MessageHandler((ushort)ClientMessage.StartMoveDown)]
+    public static void HandleClientStartMoveDown(ushort clientID, Message msg)
+    {
+        Player z = _serv.playerMap[clientID];
+        z.StartMoveDown();
+
+        Room? r = _serv.roomManager.rooms.Where(room => room.playerList.Exists(p => p.id == _serv.playerMap[clientID].id)).FirstOrDefault();
+        Player? p = _serv.GetOtherPlayerInRoom(r, _serv.playerMap[clientID].id);
+        if (p != null)
+        {
+            ushort cID = (ushort)_serv.playerMap.Where(c => c.Value.id == p?.id).FirstOrDefault().Key;
+            Connection conn = _serv.Clients.Where(c => c.Id == cID).FirstOrDefault();
+            Message ret = Message.Create(MessageSendMode.Reliable, ServerMessage.PlayerMoveDown);
+            ret.AddUShort(p.id);
+            _serv.Send(ret, conn);
+        }
+    }
+
+    [MessageHandler((ushort)ClientMessage.StartMoveUp)]
+    public static void HandleClientStartMoveUp(ushort clientID, Message msg)
+    {
+        Player z = _serv.playerMap[clientID];
+        z.StartMoveUp();
+
+        Room? r = _serv.roomManager.rooms.Where(room => room.playerList.Exists(p => p.id == _serv.playerMap[clientID].id)).FirstOrDefault();
+        Player? p = _serv.GetOtherPlayerInRoom(r, _serv.playerMap[clientID].id);
+        if (p != null)
+        {
+            ushort cID = (ushort)_serv.playerMap.Where(c => c.Value.id == p?.id).FirstOrDefault().Key;
+            Connection conn = _serv.Clients.Where(c => c.Id == cID).FirstOrDefault();
+            Message ret = Message.Create(MessageSendMode.Reliable, ServerMessage.PlayerMoveUp);
+            ret.AddUShort(p.id);
+            _serv.Send(ret, conn);
+        }
+    }
+
+    [MessageHandler((ushort)ClientMessage.StopMove)]
+    public static void HandleClientStopMove(ushort clientID, Message msg)
+    {
+        Player z = _serv.playerMap[clientID];
+        z.StopMove();
+
+        Room? r = _serv.roomManager.rooms.Where(room => room.playerList.Exists(p => p.id == _serv.playerMap[clientID].id)).FirstOrDefault();
+        Player? p = _serv.GetOtherPlayerInRoom(r, _serv.playerMap[clientID].id);
+        if (p != null)
+        {
+            ushort cID = (ushort)_serv.playerMap.Where(c => c.Value.id == p?.id).FirstOrDefault().Key;
+            Connection conn = _serv.Clients.Where(c => c.Id == cID).FirstOrDefault();
+            Message ret = Message.Create(MessageSendMode.Reliable, ServerMessage.PlayerStopMove);
+            ret.AddUShort(p.id);
+            _serv.Send(ret, conn);
+        }
+    }
+
     public static void Main(string[] args)
     {
         RiptideLogger.Initialize(Console.WriteLine, Console.WriteLine, Console.WriteLine, Console.WriteLine, false);

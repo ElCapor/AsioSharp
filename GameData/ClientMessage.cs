@@ -8,7 +8,10 @@ namespace GameData
 {
     public enum ClientMessage : ushort
     {
-        ReadyToStart
+        ReadyToStart,
+        StartMoveDown,
+        StartMoveUp,
+        StopMove,
 
     }
 }
