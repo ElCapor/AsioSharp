@@ -15,6 +15,8 @@ namespace GameData
         PlayerMoveDown,
         PlayerMoveUp,
         PlayerStopMove,
+        GameStart,
+        BallVelocityChanged
 
     }
 }

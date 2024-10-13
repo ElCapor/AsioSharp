@@ -1,13 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using Raylib_cs;
 using static Raylib_cs.Raylib;
 namespace GameData
 {
+    public class Ball
+    {
+        public Vector2 position;
+        public Vector2 velocity;
+        public EventHandler<Ball>? onBallMoved;
+
+        public Ball() {
+            position = new();
+            velocity = new();
+        }
+
+        public void SetVelocity(Vector2 velocity)
+        {
+            this.velocity = velocity;
+        }
+
+        public void StartMove(Vector2 vel)
+        {
+            SetVelocity(vel);
+        }
+
+        public void StopMove()
+        {
+            SetVelocity(new(0, 0));
+        }
+
+        public void SetPosition(Vector2 position)
+        {
+            this.position = position;
+        }
+
+        public void Update()
+        {
+            position += velocity;
+        }
+
+
+        public void Draw()
+        {
+            DrawCircle((int)position.X, (int)position.Y, 10, Color.WHITE);
+        }
+    }
     public class Player
     {
         public Vector2 Position;
@@ -98,6 +135,11 @@ namespace GameData
         {
             return obj is Player player &&
                    id == player.id;
+        }
+
+        public bool isCollidingWithBall(Ball b)
+        {
+            return CheckCollisionCircleRec(b.position, 10, new Rectangle(Position.X, Position.Y, 10,20));
         }
     }
 }

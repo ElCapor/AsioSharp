@@ -5,7 +5,7 @@ public class Room
     int maxPlayers;
     public List<Player> playerList;
     ushort id;
-
+    Ball ball;
     public EventHandler<RoomPlayerAddedArgs>? onRoomPlayerAdded;
     public EventHandler<RoomPlayerRemoveArgs>? onRoomPlayerRemoved;
 

@@ -87,7 +87,7 @@ public class App
     }
     static Player LocalPlayer = new();
     static Player otherPlayer = new();
-
+    static Ball gameBall = new();
     public static void Run()
     {
         InitWindow(800, 600, "demo");
