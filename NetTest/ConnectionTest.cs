@@ -37,7 +37,8 @@ namespace NetTest
             rm.AddPlayer(p);
             Assert.IsTrue(rm.GetAvaliableRoomIndex() == 0 && rm.rooms.Count == 1 && rm.rooms[0].playerList.Count == 1);
             rm.RemovePlayer(p);
-            Assert.IsTrue(rm.rooms.Count == 1 && rm.rooms[0].playerList.Count == 0);
+            Console.WriteLine($"Rooms {rm.rooms.Count}");
+            Assert.IsTrue(rm.rooms.Count == 0 && rm.GetAvaliableRoomIndex() == -1); // Because of garbage collection
         }
 
         [TestMethod]
