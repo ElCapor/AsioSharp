@@ -1,4 +1,4 @@
-﻿using GameData;
+﻿/*using GameData;
 using Riptide;
 using Riptide.Utils;
 using Raylib_cs;
@@ -189,7 +189,7 @@ public class App
         }
     }
 
-    public static void Main(string[] args)
+    public static void OldMain(string[] args)
     {
         RiptideLogger.Initialize(Console.WriteLine, Console.WriteLine, Console.WriteLine, Console.WriteLine, false);
         _serv.ClientConnected += _serv.OnConnect;
@@ -229,4 +229,4 @@ public class App
     }
 
     
-}
+}*/

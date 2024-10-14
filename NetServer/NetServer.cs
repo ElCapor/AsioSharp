@@ -34,7 +34,7 @@ public class NetServer : Server
         Player? otherPlayer = room.playerList.Where(player => player.id != playerId).FirstOrDefault();
         return otherPlayer;
     }
-
+        
     public void OnRoomPlayerAdded(object? sender , RoomPlayerAddedArgs args)
     {
         Console.WriteLine($"Player {args.AddedPlayer.id} added to room {args.RoomId}");
