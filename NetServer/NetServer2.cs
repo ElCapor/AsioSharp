@@ -195,6 +195,19 @@ public class RoomManagerV2<R, T> where R:RoomV2<T> where T: class
         maxRoomIndex = rooms.Count;
         Console.WriteLine($"End GC, max room index : {maxRoomIndex}");
     }
+
+    public int GetRoomIndexByID(ushort roomID)
+    {
+        int roomIndex = -1;
+        for (int i =0; i < rooms.Count; i++)
+        {
+            if (rooms[i].GetID() ==  roomID)
+            {
+                roomIndex = i; break;
+            }
+        }
+        return roomIndex;
+    }
 }
 
 public class NtServer : Server
